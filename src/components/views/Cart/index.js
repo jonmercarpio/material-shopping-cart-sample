@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Grid, Button } from "@material-ui/core";
+import { Grid, Button, Typography, Box } from "@material-ui/core";
 import ProductItem from "../Products/item";
 import cartDux from "../../../duxs/cart";
 
@@ -18,18 +18,39 @@ const CartList = props => {
     dispatch(cartDux.actions.remove(product));
   };
 
+  const totals = cart.products.reduce(
+    (a, e) => ({
+      count: a.count + e.qty,
+      amount: a.amount + e.unitPrice * e.qty
+    }),
+    {
+      count: 0,
+      amount: 0
+    }
+  );
+
   return (
-    <Grid container spacing={2}>
-      {cart.products.map(product => (
-        <Grid item xs={4} key={product.productID}>
-          <ProductItem product={product}>
-            <Button onClick={handleDecreasePress(product)}>-</Button>
-            <Button>{product.qty}</Button>
-            <Button onClick={handleIncreasePress(product)}>+</Button>
-          </ProductItem>
+    <React.Fragment>
+      <Box minHeight="85vh">
+        <Grid container spacing={2}>
+          {cart.products.map(product => (
+            <Grid item xs={4} key={product.productID}>
+              <ProductItem product={product}>
+                <Button onClick={handleDecreasePress(product)}>-</Button>
+                <Button>{product.qty}</Button>
+                <Button onClick={handleIncreasePress(product)}>+</Button>
+              </ProductItem>
+            </Grid>
+          ))}
         </Grid>
-      ))}
-    </Grid>
+      </Box>
+      <Grid container justify="flex-end">
+        <Grid item>
+          <Typography color="textSecondary">Items ({totals.count})</Typography>
+          <Typography color="textSecondary">Total: ${totals.amount}</Typography>
+        </Grid>
+      </Grid>
+    </React.Fragment>
   );
 };
 
